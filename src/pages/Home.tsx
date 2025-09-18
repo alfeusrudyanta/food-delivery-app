@@ -3,44 +3,72 @@ import React, { useMemo, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Search } from 'lucide-react';
 import iconMenu from '@/constant/home-icon-menu';
-import { useRecommendedRestaurant } from '@/hooks/useRestaurant';
+import {
+  useRecommendedRestaurant,
+  useRestaurantFilter,
+} from '@/hooks/useRestaurant';
 import { Button } from '@/components/ui/button';
 import RestaurantCard from '@/components/RestaurantCard';
 import useWindowWidth from '@/hooks/useWindowWidth';
 
 const Home: React.FC = () => {
-  const { recommendedResto } = useRecommendedRestaurant();
-
+  const { recommendedResto, isError, isLoading } = useRecommendedRestaurant();
   const isMobile = useWindowWidth();
 
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState<string>('');
   const [showMore, setShowMore] = useState(false);
 
-  const limit = isMobile ? 5 : 9;
+  const filterParams = useMemo(
+    () => ({
+      location: undefined,
+      range: undefined,
+      priceMin: undefined,
+      priceMax: undefined,
+      rating: undefined,
+      limit: 50,
+      page: 1,
+    }),
+    []
+  );
+
+  const { restaurantFilterData } = useRestaurantFilter(filterParams);
+
+  const searchTerm = search.toLowerCase();
+  const limit = useMemo(() => (isMobile ? 5 : 9), [isMobile]);
+
   const recommendations = useMemo(
-    () => recommendedResto?.data.recommendations || [],
+    () => recommendedResto?.data?.recommendations ?? [],
     [recommendedResto]
   );
 
+  const guestFilteredRestaurants = useMemo(() => {
+    const restaurants = restaurantFilterData?.data?.restaurants ?? [];
+    return restaurants.filter((data) =>
+      data.name.toLowerCase().includes(searchTerm)
+    );
+  }, [restaurantFilterData, searchTerm]);
+
   const filteredRestaurants = useMemo(() => {
-    const searchTerm = search.toLowerCase();
     return recommendations.filter(
       (data) =>
         data.name.toLowerCase().includes(searchTerm) ||
-        data.sampleMenus.some((menu) =>
+        data.sampleMenus?.some((menu) =>
           menu.foodName.toLowerCase().includes(searchTerm)
         )
     );
-  }, [recommendations, search]);
+  }, [recommendations, searchTerm]);
 
   const displayedRestaurants = showMore
     ? filteredRestaurants
     : filteredRestaurants.slice(0, limit);
   const hasMoreToShow = filteredRestaurants.length > limit && !showMore;
 
+  const guestDisplayedRestaurants = showMore
+    ? guestFilteredRestaurants
+    : guestFilteredRestaurants.slice(0, limit);
+
   return (
     <section className='flex flex-col gap-0 md:gap-12 justify-center mb-12 md:mb-[100px] bg-neutral-25'>
-      {/* Hero Section */}
       <div className="min-h-[648px] md:min-h-[827px] w-full flex items-center justify-center bg-cover bg-center bg-[linear-gradient(180deg,rgba(0,0,0,0)_-59.98%,rgba(0,0,0,0.8)_110.09%),url('/images/home-front.png')] px-[22px]">
         <div className='text-center flex items-center flex-col gap-6 md:gap-10'>
           <div className='flex flex-col gap-1 md:gap-2'>
@@ -65,7 +93,6 @@ const Home: React.FC = () => {
         </div>
       </div>
 
-      {/* Icon Menu */}
       <div className='px-4 py-6 md:py-0 md:px-[120px] w-full grid grid-cols-3 md:grid-cols-6 gap-5'>
         {iconMenu.map((icon) => (
           <Link key={icon.name} to={icon.link}>
@@ -75,6 +102,7 @@ const Home: React.FC = () => {
                   src={icon.image}
                   alt={icon.name}
                   loading='lazy'
+                  decoding='async'
                   className='size-12 md:size-[65px] group-hover:scale-105 transition-all duration-300 ease-in-out'
                 />
               </div>
@@ -86,7 +114,6 @@ const Home: React.FC = () => {
         ))}
       </div>
 
-      {/* Recommended Restaurants */}
       <div className='flex flex-col gap-4 md:gap-8 px-4 md:px-[120px]'>
         <div className='flex justify-between items-center'>
           <h2 className='w-full font-extrabold text-display-xs md:text-display-md text-neutral-950'>
@@ -103,15 +130,29 @@ const Home: React.FC = () => {
           </Link>
         </div>
 
-        {recommendations.length === 0 ? (
+        {isLoading && (
           <div className='h-10 w-10 rounded-full border-2 border-primary-100 border-t-transparent animate-spin mx-auto' />
+        )}
+
+        {isError && guestDisplayedRestaurants ? (
+          <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5'>
+            {guestDisplayedRestaurants.map((resto) => (
+              <Link key={resto.id} to={`/restaurant/${resto.id}`}>
+                <RestaurantCard
+                  logo={resto.logo}
+                  name={resto.name}
+                  star={resto.star}
+                  place={resto.place}
+                />
+              </Link>
+            ))}
+          </div>
         ) : (
           <>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-5'>
               {displayedRestaurants.map((resto) => (
-                <Link to={`/restaurant/${resto.id}`}>
+                <Link key={resto.id} to={`/restaurant/${resto.id}`}>
                   <RestaurantCard
-                    key={resto.id}
                     logo={resto.logo}
                     name={resto.name}
                     star={resto.star}
