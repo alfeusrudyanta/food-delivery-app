@@ -10,6 +10,7 @@ import useWindowWidth from '@/hooks/useWindowWidth';
 
 const Home: React.FC = () => {
   const { recommendedResto } = useRecommendedRestaurant();
+
   const isMobile = useWindowWidth();
 
   const [search, setSearch] = useState('');

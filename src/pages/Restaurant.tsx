@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { useRestoId } from '@/hooks/useRestaurant';
 import useWindowWidth from '@/hooks/useWindowWidth';
 import { Circle, Share2, Star } from 'lucide-react';
@@ -266,7 +266,9 @@ const Restaurant: React.FC = () => {
               {formatCurrency(cart.data.summary.totalPrice)}
             </span>
           </div>
-          <Button className='h-11 md:h-12 max-w-[160px]'>Checkout</Button>
+          <Link to='/checkout'>
+            <Button className='h-11 md:h-12 max-w-[160px]'>Checkout</Button>
+          </Link>
         </div>
       )}
     </section>
