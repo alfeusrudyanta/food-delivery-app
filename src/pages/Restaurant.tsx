@@ -266,8 +266,8 @@ const Restaurant: React.FC = () => {
               {formatCurrency(cart.data.summary.totalPrice)}
             </span>
           </div>
-          <Link to='/checkout'>
-            <Button className='h-11 md:h-12 max-w-[160px]'>Checkout</Button>
+          <Link to='/checkout' className='h-11 md:h-12 w-full max-w-[160px]'>
+            <Button>Checkout</Button>
           </Link>
         </div>
       )}
