@@ -26,7 +26,7 @@ const Success = () => {
   }, [orders, updateOrderStatus]);
 
   return (
-    <section className='min-h-full px-4 md:px-[500px] flex justify-center items-center flex-col gap-[28px]'>
+    <section className='min-h-full px-4 flex justify-center items-center flex-col gap-[28px]'>
       {/* Title */}
       <div className='flex flex-row gap-4 items-center mt-28'>
         <img src='/icon/logo.svg' alt='logo' height={42} width={42} />
