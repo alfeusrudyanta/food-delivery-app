@@ -1,5 +1,11 @@
 import Auth from './pages/Auth';
-import { BrowserRouter, Routes, Route, Outlet } from 'react-router-dom';
+import {
+  BrowserRouter,
+  Routes,
+  Route,
+  Outlet,
+  Navigate,
+} from 'react-router-dom';
 import Home from './pages/Home';
 import Header from './components/header/Header';
 import Footer from './components/footer/Footer';
@@ -10,6 +16,7 @@ import CheckOut from './pages/CheckOut';
 import Success from './pages/Success';
 import Order from './pages/Order';
 import Profile from './pages/Profile';
+import ProtectedRoute from '@/components/ProtectedRoute';
 
 const Layout = () => {
   return (
@@ -25,12 +32,16 @@ const Layout = () => {
 
 function App() {
   return (
-    <div>
-      <BrowserRouter>
-        <Routes>
-          <Route path='/auth' element={<Auth />} />
+    <BrowserRouter>
+      <Routes>
+        {/* Public route */}
+        <Route path='/auth' element={<Auth />} />
+        <Route element={<ProtectedRoute />}>
           <Route path='/success' element={<Success />} />
+        </Route>
 
+        {/* Protected route */}
+        <Route element={<ProtectedRoute />}>
           <Route element={<Layout />}>
             <Route path='/' element={<Home />} />
             <Route path='/restaurant/:id' element={<Restaurant />} />
@@ -40,9 +51,11 @@ function App() {
             <Route path='/order' element={<Order />} />
             <Route path='/profile' element={<Profile />} />
           </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+        </Route>
+
+        <Route path='*' element={<Navigate to='/auth' replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
