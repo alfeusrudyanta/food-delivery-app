@@ -43,7 +43,7 @@ const Header = () => {
   return (
     <div
       className={cn(
-        'fixed h-[64px] md:h-20 py-3 px-4 md:py-4 md:px-[120px] z-50 w-full transition-all duration-75 ease-in-out',
+        'fixed h-[64px] md:h-20 py-3 px-4 md:py-4 md:px-[120px] z-50 w-full transition-all duration-300 ease-in-out',
         isScrolled && 'bg-white'
       )}
     >
